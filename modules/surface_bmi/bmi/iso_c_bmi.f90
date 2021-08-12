@@ -1,0 +1,217 @@
+! The Basic Model Interface (BMI) Fortran specification.
+!
+! This language specification is derived from the Scientific
+! Interface Definition Language (SIDL) file bmi.sidl located at
+! https://github.com/csdms/bmi.
+
+module iso_c_bmif_2_0
+  use bmif_2_0
+  use, intrinsic :: iso_c_binding, only: c_ptr, c_loc, c_f_pointer, c_char, c_null_char, c_int, c_double
+  implicit none
+
+  type box
+    integer :: foobar
+    class(bmi), pointer :: ptr => null()
+  end type
+
+  type string
+    character(kind=c_char), allocatable :: item
+  end type
+
+  contains
+    pure function c_to_f_string(c_string) result(f_string)
+      implicit none
+      character(kind=c_char, len=1), intent(in) :: c_string(:)
+      character(len=:), allocatable :: f_string
+      integer i,n
+
+      !loop  through the c_string till terminator is found
+      i = 1
+      do
+        if (c_string(i) == c_null_char) then 
+            exit
+        else
+           i = i+1
+        end if
+      end do
+      n = i - 1 ! trim terminator
+      allocate(character(len=n) :: f_string)
+      f_string = transfer( c_string(1:n), f_string )
+    end function c_to_f_string
+
+    pure function f_to_c_string(f_string) result(c_string)
+      implicit none
+      character(len=*), intent(in) :: f_string
+      !Create a C compatable character array with room for a null terminator
+      character(kind=c_char, len=1), dimension( len_trim(f_string) + 1 ) :: c_string
+
+      !loop through the string, copy each char
+      integer i,n
+      n = len_trim(f_string)
+      do i = 1, n
+        c_string(i) = f_string(i:i)
+      end do
+      c_string(n+1) = c_null_char !make sure to add null terminator
+    end function f_to_c_string
+
+    ! Perform startup tasks for the model.
+    function initialize(this, config_file) result(bmi_status) bind(C, name="initialize")
+      type(c_ptr) :: this
+      character(kind=c_char, len=1), dimension(BMI_MAX_FILE_NAME), intent(in) :: config_file
+      integer(kind=c_int) :: bmi_status
+      character(kind=c_char, len=:), allocatable :: f_file 
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+      !convert c style string to fortran character array
+      f_file = c_to_f_string(config_file)
+      bmi_status = bmi_box%ptr%initialize(f_file)
+    end function initialize
+
+    ! Advance the model one time step.
+    function update(this) result(bmi_status) bind(C, name="update")
+      type(c_ptr) :: this
+      integer(kind=c_int) :: bmi_status
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+      bmi_status = bmi_box%ptr%update()
+    end function update
+
+    ! Advance the model until the given time.
+    function update_until(this, time) result(bmi_status) bind(C, name="update_until")
+      type(c_ptr) :: this
+      real(kind=c_double), intent(in) :: time
+      integer(kind=c_int) :: bmi_status
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+      bmi_status = bmi_box%ptr%update_until(time)
+    end function update_until
+
+    ! Perform teardown tasks for the model.
+    function finalize(this) result(bmi_status) bind(C, name="finalize")
+      type(c_ptr) :: this
+      integer(kind=c_int) :: bmi_status
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+      bmi_status = bmi_box%ptr%finalize()
+      !clean up the wrapper
+      !deallocate(bmi_box%ptr)
+      deallocate(bmi_box)
+    end function finalize
+
+    ! Get the name of the model.
+    function get_component_name(handle, name) result(bmi_status) bind(C, name="get_component_name")
+      type(c_ptr) :: handle
+      character(kind=c_char, len=1), dimension(*), intent(out) :: name
+      character(kind=c_char, len=BMI_MAX_COMPONENT_NAME), pointer :: f_name
+      integer(kind=c_int) :: bmi_status
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+
+      !extract the fortran type from handle
+      call c_f_pointer(handle, bmi_box)
+      bmi_status = bmi_box%ptr%get_component_name(f_name)
+      !Set the c_string input (name), make sure to inlcude the null_terminator
+      name(:len_trim(f_name)+1) = f_to_c_string(f_name)
+    end function get_component_name
+
+    ! Count the input variables.
+    function get_input_item_count(this, count) result (bmi_status) bind(C, name="get_input_item_count")
+      type(c_ptr) :: this
+      integer(kind=c_int), intent(out) :: count
+      integer(kind=c_int) :: bmi_status
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+      bmi_status = bmi_box%ptr%get_input_item_count(count)
+    end function get_input_item_count
+
+    ! Count the output variables.
+    function get_output_item_count(this, count) result (bmi_status) bind(C, name="get_output_item_count")
+      type(c_ptr) :: this
+      integer(kind=c_int), intent(out) :: count
+      integer(kind=c_int) :: bmi_status
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+      bmi_status = bmi_box%ptr%get_output_item_count(count)
+    end function get_output_item_count
+
+    ! List a model's input variables.
+    function get_input_var_names(this, names) result(bmi_status) bind(C, name="get_input_var_names")
+      type(c_ptr) :: this
+      type(c_ptr) :: names (*)
+      character(kind=c_char), pointer :: f_ptr
+      character(kind=c_char, len=BMI_MAX_FILE_NAME), pointer :: f_names(:)
+      character(kind=c_char), pointer :: c_buff_ptr
+      
+      integer(kind=c_int) :: bmi_status
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+      integer :: i, j
+
+      print *, "NAMES: ", names(1)
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+
+      bmi_status = bmi_box%ptr%get_input_var_names(f_names)
+      print *, "HERE"
+      print *, size(f_names)
+      do i = 1, size(f_names)
+        call c_f_pointer(names(i), c_buff_ptr)
+        !c_buff_ptr(:) = f_to_c_string(f_names(i))
+        print *, names(i)
+        print *, c_buff_ptr(:)
+        print *, loc(c_buff_ptr)
+        print *, f_to_c_string(f_names(i))
+        c_buff_ptr(1:1) = "F"
+        print *, c_buff_ptr(:)
+      end do
+      do i = 1, size(f_names)
+  
+      !Set the c_string input (name), make sure to inlcude the null_terminator
+      !names(:len_trim(f_names(i))+1) = f_to_c_string(f_names(i))
+      !call c_f_pointer(names(i-1), f_names(i), [BMI_MAX_FILE_NAME])
+      print *, trim(f_names(i))
+
+      end do
+    end function get_input_var_names
+
+    function register_bmi(this) result(bmi_status) bind(C, name="register_bmi")
+      use, intrinsic:: iso_c_binding, only: c_ptr, c_loc, c_int
+      use bminoahmp
+      implicit none
+      type(c_ptr) :: this ! If not value, then from the C perspective `this` is a void**
+      integer(kind=c_int) :: bmi_status
+      !Create the momdel instance to use
+      type(bmi_noahmp), target, save :: bmi_model !need to ensure scope/lifetime, use save attribute
+      !Create a simple pointer wrapper
+      type(box), pointer :: bmi_box
+
+      !allocate the pointer box
+      allocate(bmi_box)
+      !allocate(bmi_box%ptr, source=bmi_model)
+      bmi_box%foobar = 42 !test var FIXME remove
+      !associate the wrapper pointer the created model instance
+      bmi_box%ptr => bmi_model
+      !Return the pointer to box
+      this = c_loc(bmi_box)
+      bmi_status = BMI_SUCCESS
+    end function register_bmi
+
+end module iso_c_bmif_2_0
