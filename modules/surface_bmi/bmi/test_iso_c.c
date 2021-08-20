@@ -11,6 +11,7 @@ extern get_component_name(void *, char *);
 extern get_input_item_count(void*, int *);
 extern get_output_item_count(void*, int *);
 extern get_input_var_names(void*, char**);
+extern get_output_var_names(void*, char**);
 
 int BMI_SUCCESS = 0;
 int BMI_MAX_VAR_NAME = 2048;
@@ -31,6 +32,7 @@ int main(int argc, char** argv)
     void** bmi_handle;
     void** bmi_handle2;
     int status = -1;
+    int i = 0;
 
     char name[2048];
     status = register_bmi(&bmi_handle);
@@ -53,28 +55,54 @@ int main(int argc, char** argv)
     check_status(&status, "get_component_name");
     printf("Name: %s\n", name);
 
+    //Check input item handling
     int count = -1;
     status = get_input_item_count(&bmi_handle, &count);
     check_status(&status, "get_input_item_count");
     printf("input_item_count: %ld\n", count);
     char** names;
     names = malloc(sizeof(char*)*count);
-    int i = 0;
+ 
     for(i = 0; i < count; i++){
         names[i] = malloc(sizeof(char)*BMI_MAX_VAR_NAME);
         //names[i] = "Hello World\0";
         sprintf(names[i], "Hello World %d", i);
     }
-    printf("Getting names at buffer %ld\n", names);
     status = get_input_var_names(&bmi_handle, names);
     check_status(&status, "get_input_var_names");
     for(i = 0; i < count; i++){
         printf("%s\n", names[i]);
     }
+    for(i = 0; i < count; i++)
+    {
+        free(names[i]);
+    }
+    free(names);
+
+    //Check output item handling
     count = -1;
-    status = get_input_item_count(&bmi_handle, &count);
+    status = get_output_item_count(&bmi_handle, &count);
     check_status(&status, "get_output_item_count");
     printf("output_item_count: %ld\n", count);
+
+    names = malloc(sizeof(char*)*count);
+
+    for(i = 0; i < count; i++){
+        names[i] = malloc(sizeof(char)*BMI_MAX_VAR_NAME);
+        //names[i] = "Hello World\0";
+        sprintf(names[i], "Hello World %d", i);
+    }
+    status = get_output_var_names(&bmi_handle, names);
+    check_status(&status, "get_output_var_names");
+    for(i = 0; i < count; i++){
+        printf("%s\n", names[i]);
+    }
+    for(i = 0; i < count; i++)
+    {
+        free(names[i]);
+    }
+    free(names);
+
 
     finalize(&bmi_handle);
     check_status(&status, "finalize");
