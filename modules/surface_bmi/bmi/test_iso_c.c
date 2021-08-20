@@ -13,6 +13,7 @@ extern get_output_item_count(void*, int *);
 extern get_input_var_names(void*, char**);
 extern get_output_var_names(void*, char**);
 extern get_var_grid(void*, char*, int*);
+extern get_var_type(void*, char*, char*);
 
 int BMI_SUCCESS = 0;
 int BMI_MAX_VAR_NAME = 2048;
@@ -36,6 +37,8 @@ int main(int argc, char** argv)
     int i = 0;
 
     char name[2048];
+    char type[2048];
+
     status = register_bmi(&bmi_handle);
     check_status(&status, "register");
     //register_bmi(&bmi_handle2);
@@ -106,9 +109,13 @@ int main(int argc, char** argv)
 
     int grid = -1;
     status = get_var_grid(&bmi_handle, "QINSUR", &grid);
-
     printf("get_var_grid for QINSUR: %ld\n", grid);
     check_status(&status, "get_var_grid");
+
+    status = get_var_type(&bmi_handle, "QINSUR", type);
+
+    printf("get_var_type for QINSUR: %s\n", type);
+    check_status(&status, "get_var_type");
 
     finalize(&bmi_handle);
     check_status(&status, "finalize");
