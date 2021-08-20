@@ -155,41 +155,27 @@ module iso_c_bmif_2_0
     ! List a model's input variables.
     function get_input_var_names(this, names) result(bmi_status) bind(C, name="get_input_var_names")
       type(c_ptr) :: this
-      type(c_ptr) :: names (*)
-      character(kind=c_char), pointer :: f_ptr
+      type(c_ptr), intent(inout)  :: names (*)
       character(kind=c_char, len=BMI_MAX_FILE_NAME), pointer :: f_names(:)
-      character(kind=c_char), pointer :: c_buff_ptr
-      
+      character(kind=c_char, len=1), pointer :: c_buff_ptr(:)
       integer(kind=c_int) :: bmi_status
       !use a wrapper for c interop
       type(box), pointer :: bmi_box
-      integer :: i, j
+      integer :: i
 
-      print *, "NAMES: ", names(1)
       !extract the fortran type from handle
       call c_f_pointer(this, bmi_box)
 
       bmi_status = bmi_box%ptr%get_input_var_names(f_names)
-      print *, "HERE"
-      print *, size(f_names)
+      !print *, size(f_names)
       do i = 1, size(f_names)
-        call c_f_pointer(names(i), c_buff_ptr)
-        !c_buff_ptr(:) = f_to_c_string(f_names(i))
-        print *, names(i)
-        print *, c_buff_ptr(:)
-        print *, loc(c_buff_ptr)
-        print *, f_to_c_string(f_names(i))
-        c_buff_ptr(1:1) = "F"
-        print *, c_buff_ptr(:)
+        !For each pointer (one for each name), associate c_buff_ptr with the string names points to
+        call c_f_pointer(names(i), c_buff_ptr, [ BMI_MAX_COMPONENT_NAME ] )
+        !print *, c_to_f_string(c_buff_ptr)
+        !assign the c_string to buffer
+        c_buff_ptr = f_to_c_string(f_names(i))
       end do
-      do i = 1, size(f_names)
-  
-      !Set the c_string input (name), make sure to inlcude the null_terminator
-      !names(:len_trim(f_names(i))+1) = f_to_c_string(f_names(i))
-      !call c_f_pointer(names(i-1), f_names(i), [BMI_MAX_FILE_NAME])
-      print *, trim(f_names(i))
 
-      end do
     end function get_input_var_names
 
     function register_bmi(this) result(bmi_status) bind(C, name="register_bmi")

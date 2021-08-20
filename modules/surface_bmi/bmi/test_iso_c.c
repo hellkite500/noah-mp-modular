@@ -62,10 +62,11 @@ int main(int argc, char** argv)
     int i = 0;
     for(i = 0; i < count; i++){
         names[i] = malloc(sizeof(char)*BMI_MAX_VAR_NAME);
-        names[i] = "Hello World";
+        //names[i] = "Hello World\0";
+        sprintf(names[i], "Hello World %d", i);
     }
-    printf("Getting names at buffer %ld\n", &names);
-    status = get_input_var_names(&bmi_handle, &names);
+    printf("Getting names at buffer %ld\n", names);
+    status = get_input_var_names(&bmi_handle, names);
     check_status(&status, "get_input_var_names");
     for(i = 0; i < count; i++){
         printf("%s\n", names[i]);
