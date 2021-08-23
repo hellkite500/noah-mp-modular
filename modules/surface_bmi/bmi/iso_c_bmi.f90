@@ -1,8 +1,13 @@
-! The Basic Model Interface (BMI) Fortran specification.
+! The Basic Model Interface ISO_C_BINDINGING compatible free functions
 !
-! This language specification is derived from the Scientific
-! Interface Definition Language (SIDL) file bmi.sidl located at
-! https://github.com/csdms/bmi.
+! @author: Nels Frazier
+! @email: nels.frazier@noaa.gov
+! Date: August 23, 2021
+!
+! This module provides a set of ISO_C_BINDING compatable functions
+! that allow a Fortran BMI compatible model to interoperate with a C program, given that the
+! BMI module implelements a `register` function that is able to return an appropriate opaque handle
+! to the C caller.
 
 module iso_c_bmif_2_0
   use bmif_2_0
@@ -10,12 +15,7 @@ module iso_c_bmif_2_0
   implicit none
 
   type box
-    integer :: foobar
     class(bmi), pointer :: ptr => null()
-  end type
-
-  type string
-    character(kind=c_char), allocatable :: item
   end type
 
   contains
@@ -215,7 +215,6 @@ module iso_c_bmif_2_0
       !extract the fortran type from handle
       call c_f_pointer(this, bmi_box)
       bmi_status = bmi_box%ptr%get_var_grid(c_to_f_string(name), grid)
-
     end function get_var_grid
 
     ! Get the data type of the given variable as a string.
@@ -232,7 +231,6 @@ module iso_c_bmif_2_0
       call c_f_pointer(this, bmi_box)
       bmi_status = bmi_box%ptr%get_var_type(c_to_f_string(name), f_type)
       type(1:len_trim(f_type)+1) = f_to_c_string(f_type)
-
     end function get_var_type
 
     ! Get the units of the given variable.
@@ -744,7 +742,6 @@ module iso_c_bmif_2_0
       !allocate the pointer box
       allocate(bmi_box)
       !allocate(bmi_box%ptr, source=bmi_model)
-      bmi_box%foobar = 42 !test var FIXME remove
       !associate the wrapper pointer the created model instance
       bmi_box%ptr => bmi_model
       !Return the pointer to box
