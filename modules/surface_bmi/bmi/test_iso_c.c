@@ -38,6 +38,13 @@ extern get_grid_origin(void*, int*, double*);
 extern get_grid_x(void*, int*, double*);
 extern get_grid_y(void*, int*, double*);
 extern get_grid_z(void*, int*, double*);
+extern get_grid_node_count(void*, int*, int*);
+extern get_grid_edge_count(void*, int*, int*);
+extern get_grid_face_count(void*, int*, int*);
+extern get_grid_edge_nodes(void*, int*, int*);
+extern get_grid_face_edges(void*, int*, int*);
+extern get_grid_face_nodes(void*, int*, int*);
+extern get_grid_nodes_per_face(void*, int*, int*);
 
 int BMI_SUCCESS = 0;
 int BMI_MAX_VAR_NAME = 2048;
@@ -273,6 +280,47 @@ int main(int argc, char** argv)
     printf("get_grid_zs %d: %lf\n", grid, zs[0]);
     check_status(&status, "get_grid_z");
 
+    int node_count = -2;
+    grid = 0;
+    status = get_grid_node_count(&bmi_handle, &grid, &node_count);
+    printf("get_grid_node_count %d: %d\n", grid, node_count);
+    check_status(&status, "get_grid_node_count");
+
+    int edge_count = -2;
+    grid = 0;
+    status = get_grid_edge_count(&bmi_handle, &grid, &edge_count);
+    printf("get_grid_edge_count %d: %d\n", grid, edge_count);
+    // check_status(&status, "get_grid_edge_count");
+
+    int face_count = -2;
+    grid = 0;
+    status = get_grid_face_count(&bmi_handle, &grid, &face_count);
+    printf("get_grid_face_count %d: %d\n", grid, face_count);
+    // check_status(&status, "get_grid_face_count");
+
+    int edge_nodes[1] = {-2.0};
+    grid = 0;
+    status = get_grid_edge_nodes(&bmi_handle, &grid, &edge_nodes);
+    printf("get_grid_edge_nodes %d: %d\n", grid, edge_nodes[0]);
+    // check_status(&status, "get_grid_edge_nodes");
+
+    int face_edges[1] = {-2.0};
+    grid = 0;
+    status = get_grid_face_edges(&bmi_handle, &grid, &face_edges);
+    printf("get_grid_face_edges %d: %d\n", grid, face_edges[0]);
+    // check_status(&status, "get_grid_face_edges");
+
+    int face_nodes[1] = {-2.0};
+    grid = 0;
+    status = get_grid_face_nodes(&bmi_handle, &grid, &face_nodes);
+    printf("get_grid_face_nodes %d: %d\n", grid, face_nodes[0]);
+    // check_status(&status, "get_grid_face_nodes");
+
+    int nodes_per_face[1] = {-2.0};
+    grid = 0;
+    status = get_grid_nodes_per_face(&bmi_handle, &grid, &nodes_per_face);
+    printf("get_grid_nodes_per_face %d: %d\n", grid, nodes_per_face[0]);
+    // check_status(&status, "get_grid_nodes_per_face");
 
     status = finalize(&bmi_handle);
     check_status(&status, "finalize");

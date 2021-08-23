@@ -611,6 +611,108 @@ module iso_c_bmif_2_0
       bmi_status = bmi_box%ptr%get_grid_z(grid, z(:num_nodes))
     end function get_grid_z
 
+    ! Get the number of nodes in an unstructured grid.
+    function get_grid_node_count(this, grid, count) result(bmi_status) bind(C, name="get_grid_node_count")
+      type(c_ptr) :: this
+      integer(kind=c_int), intent(in) :: grid
+      integer(kind=c_int), intent(out) :: count
+      integer(kind=c_int) :: bmi_status
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+      bmi_status = bmi_box%ptr%get_grid_node_count(grid, count)
+    end function get_grid_node_count
+
+    ! Get the number of edges in an unstructured grid.
+    function get_grid_edge_count(this, grid, count) result(bmi_status) bind(C, name="get_grid_edge_count")
+      type(c_ptr) :: this
+      integer(kind=c_int), intent(in) :: grid
+      integer(kind=c_int), intent(out) :: count
+      integer(kind=c_int) :: bmi_status
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+      bmi_status = bmi_box%ptr%get_grid_edge_count(grid, count)
+    end function get_grid_edge_count
+
+    ! Get the number of faces in an unstructured grid.
+    function get_grid_face_count(this, grid, count) result(bmi_status) bind(C, name="get_grid_face_count")
+      type(c_ptr) :: this
+      integer(kind=c_int), intent(in) :: grid
+      integer(kind=c_int), intent(out) :: count
+      integer(kind=c_int) :: bmi_status
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+      bmi_status = bmi_box%ptr%get_grid_face_count(grid, count)
+    end function get_grid_face_count
+
+    ! Get the edge-node connectivity.
+    function get_grid_edge_nodes(this, grid, edge_nodes) result(bmi_status) bind(C, name="get_grid_edge_nodes")
+      type(c_ptr) :: this
+      integer(kind=c_int), intent(in) :: grid
+      integer(kind=c_int), intent(out) :: edge_nodes (*)
+      integer(kind=c_int) :: bmi_status
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+      integer :: num_nodes
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+      bmi_status = bmi_box%ptr%get_grid_node_count(grid, num_nodes)
+      bmi_status = bmi_box%ptr%get_grid_edge_nodes(grid, edge_nodes(:num_nodes))
+    end function get_grid_edge_nodes
+
+    ! Get the face-edge connectivity.
+    function get_grid_face_edges(this, grid, face_edges) result(bmi_status) bind(C, name="get_grid_face_edges")
+      type(c_ptr) :: this
+      integer(kind=c_int), intent(in) :: grid
+      integer(kind=c_int), intent(out) :: face_edges (*)
+      integer(kind=c_int) :: bmi_status
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+      integer :: num_faces
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+      bmi_status = bmi_box%ptr%get_grid_face_count(grid, num_faces)
+      bmi_status = bmi_box%ptr%get_grid_face_edges(grid, face_edges(:num_faces))
+    end function get_grid_face_edges
+
+    ! Get the face-node connectivity.
+    function get_grid_face_nodes(this, grid, face_nodes) result(bmi_status) bind(C, name="get_grid_face_nodes")
+      type(c_ptr) :: this
+      integer(kind=c_int), intent(in) :: grid
+      integer(kind=c_int), intent(out) :: face_nodes (*)
+      integer(kind=c_int) :: bmi_status
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+      integer :: num_faces
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+      bmi_status = bmi_box%ptr%get_grid_face_count(grid, num_faces)
+      bmi_status = bmi_box%ptr%get_grid_face_nodes(grid, face_nodes(:num_faces))
+    end function get_grid_face_nodes
+
+    ! Get the number of nodes for each face.
+    function get_grid_nodes_per_face(this, grid, nodes_per_face) result(bmi_status) bind(C, name="get_grid_nodes_per_face")
+      type(c_ptr) :: this
+      integer(kind=c_int), intent(in) :: grid
+      integer(kind=c_int), intent(out) :: nodes_per_face (*)
+      integer(kind=c_int) :: bmi_status
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+      integer :: num_faces
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+      bmi_status = bmi_box%ptr%get_grid_face_count(grid, num_faces)
+      bmi_status = bmi_box%ptr%get_grid_nodes_per_face(grid, nodes_per_face(:num_faces))
+    end function get_grid_nodes_per_face
+
     function register_bmi(this) result(bmi_status) bind(C, name="register_bmi")
       use, intrinsic:: iso_c_binding, only: c_ptr, c_loc, c_int
       use bminoahmp
@@ -618,6 +720,7 @@ module iso_c_bmif_2_0
       type(c_ptr) :: this ! If not value, then from the C perspective `this` is a void**
       integer(kind=c_int) :: bmi_status
       !Create the momdel instance to use
+      !Definitely need to carefully undertand and document the semantics of the save attribute here
       type(bmi_noahmp), target, save :: bmi_model !need to ensure scope/lifetime, use save attribute
       !Create a simple pointer wrapper
       type(box), pointer :: bmi_box
