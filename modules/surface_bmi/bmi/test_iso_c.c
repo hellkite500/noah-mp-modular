@@ -18,6 +18,11 @@ extern get_var_units(void*, char*, char*);
 extern get_var_itemsize(void*, char*, int*);
 extern get_var_nbytes(void*, char*, int*);
 extern get_var_location(void*, char*, char*);
+extern get_current_time(void*, double *);
+extern get_start_time(void*, double *);
+extern get_end_time(void*, double *);
+extern get_time_units(void*, char *);
+extern get_time_step(void*, double *);
 
 int BMI_SUCCESS = 0;
 int BMI_MAX_VAR_NAME = 2048;
@@ -138,6 +143,31 @@ int main(int argc, char** argv)
     status = get_var_location(&bmi_handle, "QINSUR", location);
     printf("get_var_location for QINSUR: %s\n", location);
     check_status(&status, "get_var_location");
+
+    double time = -1.0;
+    status = get_current_time(&bmi_handle, &time);
+    printf("get_current_time: %f\n", time);
+    check_status(&status, "get_current_time");
+
+    time = -1.0;
+    status = get_start_time(&bmi_handle, &time);
+    printf("get_start_time: %f\n", time);
+    check_status(&status, "get_start_time");
+
+    time = -1.0;
+    status = get_end_time(&bmi_handle, &time);
+    printf("get_end_time: %f\n", time);
+    check_status(&status, "get_end_time");
+
+    char time_units[2048];
+    status = get_time_units(&bmi_handle, time_units);
+    printf("get_time_units: %s\n", time_units);
+    check_status(&status, "get_time_units");
+
+    time = -1.0;
+    status = get_time_step(&bmi_handle, &time);
+    printf("get_time_step: %f\n", time);
+    check_status(&status, "get_time_step");
 
     finalize(&bmi_handle);
     check_status(&status, "finalize");

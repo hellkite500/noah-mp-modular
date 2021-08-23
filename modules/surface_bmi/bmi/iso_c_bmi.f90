@@ -295,6 +295,73 @@ module iso_c_bmif_2_0
       location(1:len_trim(f_location)+1) = f_to_c_string(f_location)
     end function get_var_location
 
+    ! Current time of the model.
+    function get_current_time(this, time) result(bmi_status) bind(C, name="get_current_time")
+      type(c_ptr) :: this
+      real(kind=c_double), intent(out) :: time
+      integer(kind=c_int) :: bmi_status
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+      bmi_status = bmi_box%ptr%get_current_time(time)
+    end function get_current_time
+
+    ! Start time of the model.
+    function get_start_time(this, time) result(bmi_status) bind(C, name="get_start_time")
+      type(c_ptr) :: this
+      real(kind=c_double), intent(out) :: time
+      integer(kind=c_int) :: bmi_status
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+      bmi_status = bmi_box%ptr%get_start_time(time)
+    end function get_start_time
+
+    ! End time of the model.
+    function get_end_time(this, time) result(bmi_status) bind(C, name="get_end_time")
+      type(c_ptr) :: this
+      real(kind=c_double), intent(out) :: time
+      integer(kind=c_int) :: bmi_status
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+      bmi_status = bmi_box%ptr%get_end_time(time)
+    end function get_end_time
+
+    ! Time units of the model.
+    function get_time_units(this, units) result(bmi_status) bind(C, name="get_time_units")
+      type(c_ptr) :: this
+      character(kind=c_char, len=1), intent(out) :: units (*)
+      character(kind=c_char, len=BMI_MAX_COMPONENT_NAME) :: f_units
+      integer(kind=c_int) :: bmi_status
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+      bmi_status = bmi_box%ptr%get_time_units(f_units)
+      units(1:len_trim(f_units)+1) = f_to_c_string(f_units)
+    end function get_time_units
+
+    ! Time step of the model.
+    function get_time_step(this, time_step) result(bmi_status) bind(C, name="get_time_step")
+      type(c_ptr) :: this
+      real(kind=c_double), intent(out) :: time_step
+      integer(kind=c_int) :: bmi_status
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+      bmi_status = bmi_box%ptr%get_time_step(time_step)
+    end function get_time_step
+
     function register_bmi(this) result(bmi_status) bind(C, name="register_bmi")
       use, intrinsic:: iso_c_binding, only: c_ptr, c_loc, c_int
       use bminoahmp
