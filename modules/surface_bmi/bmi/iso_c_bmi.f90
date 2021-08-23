@@ -411,6 +411,54 @@ module iso_c_bmif_2_0
       bmi_status = bmi_box%ptr%get_value_double(c_to_f_string(name), dest(:1))
     end function get_value_double
 
+    ! Set new values for an integer model variable.
+    function set_value_int(this, name, src) result(bmi_status) bind(C, name="set_value_int")
+      type(c_ptr) :: this
+      character(kind=c_char, len=1), dimension(BMI_MAX_COMPONENT_NAME), intent(in) :: name
+      integer(kind=c_int) :: src(*)
+      integer(kind=c_int) :: bmi_status
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+      !FIXME this assumes src has 1 element...what happends when it doesnt?
+      !How to determine how big this flattened array should be apriori?
+      bmi_status = bmi_box%ptr%set_value_int(c_to_f_string(name), src(:1))
+    end function set_value_int
+
+    ! Set new values for a real model variable.
+    function set_value_float(this, name, src) result(bmi_status) bind(C, name="set_value_float")
+      type(c_ptr) :: this
+      character(kind=c_char, len=1), dimension(BMI_MAX_COMPONENT_NAME), intent(in) :: name
+      real(kind=c_float) :: src(*)
+      integer(kind=c_int) :: bmi_status
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+      !FIXME this assumes dest has 1 element...what happends when it doesnt?
+      !How to determine how big this flattened array should be apriori?
+      bmi_status = bmi_box%ptr%set_value_float(c_to_f_string(name), src(:1))
+    end function set_value_float
+
+    ! Set new values for a double model variable.
+    function set_value_double(this, name, src) result(bmi_status) bind(C, name="set_value_double")
+      type(c_ptr) :: this
+      character(kind=c_char, len=1), dimension(BMI_MAX_COMPONENT_NAME), intent(in) :: name
+      real(kind=c_double) :: src(*)
+      integer(kind=c_int) :: bmi_status
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+      !FIXME this assumes dest has 1 element...what happends when it doesnt?
+      !How to determine how big this flattened array should be apriori?
+      bmi_status = bmi_box%ptr%set_value_double(c_to_f_string(name), src(:1))
+    end function set_value_double
+
     function register_bmi(this) result(bmi_status) bind(C, name="register_bmi")
       use, intrinsic:: iso_c_binding, only: c_ptr, c_loc, c_int
       use bminoahmp

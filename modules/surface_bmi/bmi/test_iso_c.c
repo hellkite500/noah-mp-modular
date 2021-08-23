@@ -25,6 +25,10 @@ extern get_time_units(void*, char *);
 extern get_time_step(void*, double *);
 extern get_value_int(void*, char*, int*);
 extern get_value_float(void*, char*, float*);
+extern get_value_double(void*, char*, double*);
+extern set_value_int(void*, char*, int*);
+extern set_value_float(void*, char*, float*);
+extern set_value_double(void*, char*, double*);
 
 int BMI_SUCCESS = 0;
 int BMI_MAX_VAR_NAME = 2048;
@@ -185,6 +189,25 @@ int main(int argc, char** argv)
     status = get_value_double(&bmi_handle, "QINSUR", &value_d);
     printf("get_value_double QINSUR: %f\n", value_d);
     // check_status(&status, "get_value_double");
+
+    value = 2;
+    status = set_value_int(&bmi_handle, "none", &value);
+    printf("set_value_int: %d\n", value);
+    // check_status(&status, "set_value_int");
+
+    value_f = 2.0;
+    status = set_value_float(&bmi_handle, "QINSUR", &value_f);
+    printf("set_value_float QINSUR: %f\n", value_f);
+    check_status(&status, "set_value_float");
+    value_f = -2.0;
+    status = get_value_float(&bmi_handle, "QINSUR", &value_f);
+    printf("get_value_float QINSUR: %f\n", value_f);
+    check_status(&status, "get_value_float");
+
+    value_d = -2.0;
+    status = set_value_double(&bmi_handle, "QINSUR", &value_d);
+    printf("set_value_double QINSUR: %f\n", value_d);
+    // check_status(&status, "set_value_double");
 
     status = finalize(&bmi_handle);
     check_status(&status, "finalize");
