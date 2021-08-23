@@ -29,6 +29,9 @@ extern get_value_double(void*, char*, double*);
 extern set_value_int(void*, char*, int*);
 extern set_value_float(void*, char*, float*);
 extern set_value_double(void*, char*, double*);
+extern get_grid_rank(void*, int*, int*);
+extern get_grid_size(void*, int*, int*);
+extern get_grid_type(void*, int*, char*);
 
 int BMI_SUCCESS = 0;
 int BMI_MAX_VAR_NAME = 2048;
@@ -208,6 +211,24 @@ int main(int argc, char** argv)
     status = set_value_double(&bmi_handle, "QINSUR", &value_d);
     printf("set_value_double QINSUR: %f\n", value_d);
     // check_status(&status, "set_value_double");
+
+    int rank = -2;
+    grid = 0;
+    status = get_grid_rank(&bmi_handle, &grid, &rank);
+    printf("get_grid_rank %d: %d\n", grid, rank);
+    check_status(&status, "get_grid_rank");
+
+    int grid_size = -2;
+    grid = 0;
+    status = get_grid_size(&bmi_handle, &grid, &grid_size);
+    printf("get_grid_size %d: %d\n", grid, grid_size);
+    check_status(&status, "get_grid_size");
+
+    char grid_type[2048];
+    grid = 0;
+    status = get_grid_type(&bmi_handle, &grid, grid_type);
+    printf("get_grid_type %d: %s\n", grid, grid_type);
+    check_status(&status, "get_grid_type");
 
     status = finalize(&bmi_handle);
     check_status(&status, "finalize");

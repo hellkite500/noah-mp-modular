@@ -459,6 +459,50 @@ module iso_c_bmif_2_0
       bmi_status = bmi_box%ptr%set_value_double(c_to_f_string(name), src(:1))
     end function set_value_double
 
+    ! Get number of dimensions of the computational grid.
+    function get_grid_rank(this, grid, rank) result(bmi_status) bind(C, name="get_grid_rank")
+      type(c_ptr) :: this
+      integer(kind=c_int), intent(in) :: grid
+      integer(kind=c_int), intent(out) :: rank
+      integer(kind=c_int) :: bmi_status
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+      bmi_status = bmi_box%ptr%get_grid_rank(grid, rank)
+    end function get_grid_rank
+
+    ! Get the total number of elements in the computational grid.
+    function get_grid_size(this, grid, size) result(bmi_status) bind(C, name="get_grid_size")
+      type(c_ptr) :: this
+      integer(kind=c_int), intent(in) :: grid
+      integer(kind=c_int), intent(out) :: size
+      integer(kind=c_int) :: bmi_status
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+      bmi_status = bmi_box%ptr%get_grid_size(grid, size)
+    end function get_grid_size
+
+    ! Get the grid type as a string.
+    function get_grid_type(this, grid, type) result(bmi_status) bind(C, name="get_grid_type")
+      type(c_ptr) :: this
+      integer(kind=c_int), intent(in) :: grid
+      character(kind=c_char, len=1), intent(out) :: type (*)
+      character(kind=c_char, len=BMI_MAX_COMPONENT_NAME) :: f_type
+      integer(kind=c_int) :: bmi_status
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+      bmi_status = bmi_box%ptr%get_grid_type(grid, f_type)
+      type(1:len_trim(f_type)+1) = f_to_c_string(f_type)
+    end function get_grid_type
+
     function register_bmi(this) result(bmi_status) bind(C, name="register_bmi")
       use, intrinsic:: iso_c_binding, only: c_ptr, c_loc, c_int
       use bminoahmp
