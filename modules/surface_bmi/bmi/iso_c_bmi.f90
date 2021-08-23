@@ -235,6 +235,22 @@ module iso_c_bmif_2_0
 
     end function get_var_type
 
+    ! Get the units of the given variable.
+    function get_var_units(this, name, units) result(bmi_status) bind(C, name="get_var_units")
+      type(c_ptr) :: this
+      character(kind=c_char, len=1), dimension(BMI_MAX_COMPONENT_NAME), intent(in) :: name
+      character(kind=c_char, len=1), intent(out) :: units (*)
+      character(kind=c_char, len=BMI_MAX_COMPONENT_NAME) :: f_units
+      integer(kind=c_int) :: bmi_status
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+      bmi_status = bmi_box%ptr%get_var_units(c_to_f_string(name), f_units)
+      units(1:len_trim(f_units)+1) = f_to_c_string(f_units)
+    end function get_var_units
+
     function register_bmi(this) result(bmi_status) bind(C, name="register_bmi")
       use, intrinsic:: iso_c_binding, only: c_ptr, c_loc, c_int
       use bminoahmp
