@@ -369,12 +369,12 @@ module iso_c_bmif_2_0
       !use a wrapper for c interop
       type(box), pointer :: bmi_box
       !for determining the number of items to get
-      integer :: item_size, num_bytes, num_items
+      integer :: item_size, num_bytes, num_items, grid
       !extract the fortran type from handle
       call c_f_pointer(this, bmi_box)
-      bmi_status = bmi_box%ptr%get_var_itemsize(c_to_f_string(name), item_size)
-      bmi_status = bmi_box%ptr%get_var_nbytes(c_to_f_string(name), num_bytes)
-      num_items = item_size / num_bytes
+  
+      bmi_status = bmi_box%ptr%get_var_grid(c_to_f_string(name), grid)
+      bmi_status = bmi_box%ptr%get_grid_size(grid, num_items)
       bmi_status = bmi_box%ptr%get_value_int(c_to_f_string(name), dest(:num_items))
     end function get_value_int
 
@@ -387,13 +387,12 @@ module iso_c_bmif_2_0
       !use a wrapper for c interop
       type(box), pointer :: bmi_box
       !for determining the number of items to get
-      integer :: item_size, num_bytes, num_items
+      integer :: item_size, num_bytes, num_items, grid
       !extract the fortran type from handle
       call c_f_pointer(this, bmi_box)
   
-      bmi_status = bmi_box%ptr%get_var_itemsize(c_to_f_string(name), item_size)
-      bmi_status = bmi_box%ptr%get_var_nbytes(c_to_f_string(name), num_bytes)
-      num_items = item_size / num_bytes
+      bmi_status = bmi_box%ptr%get_var_grid(c_to_f_string(name), grid)
+      bmi_status = bmi_box%ptr%get_grid_size(grid, num_items)
       bmi_status = bmi_box%ptr%get_value_float(c_to_f_string(name), dest(:num_items))
     end function get_value_float
 
@@ -406,13 +405,12 @@ module iso_c_bmif_2_0
             !use a wrapper for c interop
       type(box), pointer :: bmi_box
       !for determining the number of items to get
-      integer :: item_size, num_bytes, num_items
+      integer :: item_size, num_bytes, num_items, grid
       !extract the fortran type from handle
       call c_f_pointer(this, bmi_box)
   
-      bmi_status = bmi_box%ptr%get_var_itemsize(c_to_f_string(name), item_size)
-      bmi_status = bmi_box%ptr%get_var_nbytes(c_to_f_string(name), num_bytes)
-      num_items = item_size / num_bytes
+      bmi_status = bmi_box%ptr%get_var_grid(c_to_f_string(name), grid)
+      bmi_status = bmi_box%ptr%get_grid_size(grid, num_items)
       bmi_status = bmi_box%ptr%get_value_double(c_to_f_string(name), dest(:num_items))
     end function get_value_double
 
@@ -424,14 +422,13 @@ module iso_c_bmif_2_0
       integer(kind=c_int) :: bmi_status
       !use a wrapper for c interop
       type(box), pointer :: bmi_box
-      !for determining the number of items to get
-      integer :: item_size, num_bytes, num_items
+      !for determining the number of items to set
+      integer :: item_size, num_bytes, num_items, grid
       !extract the fortran type from handle
       call c_f_pointer(this, bmi_box)
   
-      bmi_status = bmi_box%ptr%get_var_itemsize(c_to_f_string(name), item_size)
-      bmi_status = bmi_box%ptr%get_var_nbytes(c_to_f_string(name), num_bytes)
-      num_items = item_size / num_bytes
+      bmi_status = bmi_box%ptr%get_var_grid(c_to_f_string(name), grid)
+      bmi_status = bmi_box%ptr%get_grid_size(grid, num_items)
       bmi_status = bmi_box%ptr%set_value_int(c_to_f_string(name), src(:num_items))
     end function set_value_int
 
@@ -443,14 +440,13 @@ module iso_c_bmif_2_0
       integer(kind=c_int) :: bmi_status
       !use a wrapper for c interop
       type(box), pointer :: bmi_box
-      !for determining the number of items to get
-      integer :: item_size, num_bytes, num_items
+      !for determining the number of items to set
+      integer :: item_size, num_bytes, num_items, grid
       !extract the fortran type from handle
       call c_f_pointer(this, bmi_box)
   
-      bmi_status = bmi_box%ptr%get_var_itemsize(c_to_f_string(name), item_size)
-      bmi_status = bmi_box%ptr%get_var_nbytes(c_to_f_string(name), num_bytes)
-      num_items = item_size / num_bytes
+      bmi_status = bmi_box%ptr%get_var_grid(c_to_f_string(name), grid)
+      bmi_status = bmi_box%ptr%get_grid_size(grid, num_items)
       bmi_status = bmi_box%ptr%set_value_float(c_to_f_string(name), src(:num_items))
     end function set_value_float
 
@@ -462,14 +458,13 @@ module iso_c_bmif_2_0
       integer(kind=c_int) :: bmi_status
       !use a wrapper for c interop
       type(box), pointer :: bmi_box
-      !for determining the number of items to get
-      integer :: item_size, num_bytes, num_items
+      !for determining the number of items to set
+      integer :: item_size, num_bytes, num_items, grid
       !extract the fortran type from handle
       call c_f_pointer(this, bmi_box)
   
-      bmi_status = bmi_box%ptr%get_var_itemsize(c_to_f_string(name), item_size)
-      bmi_status = bmi_box%ptr%get_var_nbytes(c_to_f_string(name), num_bytes)
-      num_items = item_size / num_bytes
+      bmi_status = bmi_box%ptr%get_var_grid(c_to_f_string(name), grid)
+      bmi_status = bmi_box%ptr%get_grid_size(grid, num_items)
       bmi_status = bmi_box%ptr%set_value_double(c_to_f_string(name), src(:num_items))
     end function set_value_double
 
