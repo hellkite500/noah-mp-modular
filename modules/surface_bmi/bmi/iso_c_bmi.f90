@@ -279,6 +279,22 @@ module iso_c_bmif_2_0
       bmi_status = bmi_box%ptr%get_var_nbytes(c_to_f_string(name), nbytes)
     end function get_var_nbytes
 
+    ! Describe where a variable is located: node, edge, or face.
+    function get_var_location(this, name, location) result(bmi_status) bind(C, name="get_var_location")
+      type(c_ptr) :: this
+      character(kind=c_char, len=1), dimension(BMI_MAX_COMPONENT_NAME), intent(in) :: name
+      character(kind=c_char, len=1), intent(out) :: location (*)
+      character(kind=c_char, len=BMI_MAX_COMPONENT_NAME) :: f_location
+      integer(kind=c_int) :: bmi_status
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+      bmi_status = bmi_box%ptr%get_var_location(c_to_f_string(name), f_location)
+      location(1:len_trim(f_location)+1) = f_to_c_string(f_location)
+    end function get_var_location
+
     function register_bmi(this) result(bmi_status) bind(C, name="register_bmi")
       use, intrinsic:: iso_c_binding, only: c_ptr, c_loc, c_int
       use bminoahmp

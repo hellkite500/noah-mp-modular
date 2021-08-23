@@ -17,6 +17,7 @@ extern get_var_type(void*, char*, char*);
 extern get_var_units(void*, char*, char*);
 extern get_var_itemsize(void*, char*, int*);
 extern get_var_nbytes(void*, char*, int*);
+extern get_var_location(void*, char*, char*);
 
 int BMI_SUCCESS = 0;
 int BMI_MAX_VAR_NAME = 2048;
@@ -41,6 +42,7 @@ int main(int argc, char** argv)
 
     char name[2048];
     char type[2048];
+    char location[2048];
 
     status = register_bmi(&bmi_handle);
     check_status(&status, "register");
@@ -132,6 +134,10 @@ int main(int argc, char** argv)
     status = get_var_nbytes(&bmi_handle, "QINSUR", &size);
     printf("get_var_nbytes for QINSUR: %d\n", size);
     check_status(&status, "get_var_nbytes");
+
+    status = get_var_location(&bmi_handle, "QINSUR", location);
+    printf("get_var_location for QINSUR: %s\n", location);
+    check_status(&status, "get_var_location");
 
     finalize(&bmi_handle);
     check_status(&status, "finalize");
