@@ -562,10 +562,54 @@ module iso_c_bmif_2_0
       bmi_status = bmi_box%ptr%get_grid_rank(grid, rank)
       if (rank == 0) then
         rank = 1
-      end if 
-      rank = 2
+      end if
       bmi_status = bmi_box%ptr%get_grid_origin(grid, origin(:rank))
     end function get_grid_origin
+
+    ! Get the x-coordinates of the nodes of a computational grid.
+    function get_grid_x(this, grid, x) result(bmi_status) bind(C, name="get_grid_x")
+      type(c_ptr) :: this
+      integer(kind=c_int), intent(in) :: grid
+      real(kind=c_double), intent(out) :: x (*)
+      integer(kind=c_int) :: bmi_status
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+      integer :: num_nodes
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+      bmi_status = bmi_box%ptr%get_grid_node_count(grid, num_nodes)
+      bmi_status = bmi_box%ptr%get_grid_x(grid, x(:num_nodes))
+    end function get_grid_x
+
+    ! Get the y-coordinates of the nodes of a computational grid.
+    function get_grid_y(this, grid, y) result(bmi_status) bind(C, name="get_grid_y")
+      type(c_ptr) :: this
+      integer(kind=c_int), intent(in) :: grid
+      real(kind=c_double), intent(out) :: y (*)
+      integer(kind=c_int) :: bmi_status
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+      integer :: num_nodes
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+      bmi_status = bmi_box%ptr%get_grid_node_count(grid, num_nodes)
+      bmi_status = bmi_box%ptr%get_grid_y(grid, y(:num_nodes))
+    end function get_grid_y
+
+    ! Get the z-coordinates of the nodes of a computational grid.
+    function get_grid_z(this, grid, z) result(bmi_status) bind(C, name="get_grid_z")
+      type(c_ptr) :: this
+      integer(kind=c_int), intent(in) :: grid
+      real(kind=c_double), intent(out) :: z (*)
+      integer(kind=c_int) :: bmi_status
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+      integer :: num_nodes
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+      bmi_status = bmi_box%ptr%get_grid_node_count(grid, num_nodes)
+      bmi_status = bmi_box%ptr%get_grid_z(grid, z(:num_nodes))
+    end function get_grid_z
 
     function register_bmi(this) result(bmi_status) bind(C, name="register_bmi")
       use, intrinsic:: iso_c_binding, only: c_ptr, c_loc, c_int
