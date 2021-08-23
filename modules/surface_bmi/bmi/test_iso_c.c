@@ -15,6 +15,7 @@ extern get_output_var_names(void*, char**);
 extern get_var_grid(void*, char*, int*);
 extern get_var_type(void*, char*, char*);
 extern get_var_units(void*, char*, char*);
+extern get_var_itemsize(void*, char*, int*);
 
 int BMI_SUCCESS = 0;
 int BMI_MAX_VAR_NAME = 2048;
@@ -121,6 +122,11 @@ int main(int argc, char** argv)
     printf("get_var_units for QINSUR: %s\n", type);
     check_status(&status, "get_var_units");
 
+    int size = -1;
+    status = get_var_itemsize(&bmi_handle, "QINSUR", &size);
+    printf("get_var_itemsize for QINSUR: %d\n", size);
+    check_status(&status, "get_var_itemsize");
+    
     finalize(&bmi_handle);
     check_status(&status, "finalize");
 
