@@ -503,6 +503,70 @@ module iso_c_bmif_2_0
       type(1:len_trim(f_type)+1) = f_to_c_string(f_type)
     end function get_grid_type
 
+    ! Get the dimensions of the computational grid.
+    function get_grid_shape(this, grid, shape) result(bmi_status) bind(C, name="get_grid_shape")
+      type(c_ptr) :: this
+      integer(kind=c_int), intent(in) :: grid
+      integer(kind=c_int), intent(out) :: shape (*)
+      integer(kind=c_int) :: bmi_status
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+      integer(kind=c_int) :: rank
+
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+      !Check the  grid rank to decide how many dimsions shape should have
+      !it needs at least one to hold the sentinel (no shape) value
+      bmi_status = bmi_box%ptr%get_grid_rank(grid, rank)
+      if (rank == 0) then
+        rank = 1
+      end if 
+      bmi_status = bmi_box%ptr%get_grid_shape(grid, shape(:rank))
+    end function get_grid_shape
+
+    ! Get distance between nodes of the computational grid.
+    function get_grid_spacing(this, grid, spacing) result(bmi_status) bind(C, name="get_grid_spacing")
+      type(c_ptr) :: this
+      integer(kind=c_int), intent(in) :: grid
+      real(kind=c_double), intent(out) :: spacing (*)
+      integer(kind=c_int) :: bmi_status
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+      integer(kind=c_int) :: rank
+
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+      !Check the  grid rank to decide how many dimsions shape should have
+      !it needs at least one to hold the sentinel (no shape) value
+      bmi_status = bmi_box%ptr%get_grid_rank(grid, rank)
+      if (rank == 0) then
+        rank = 1
+      end if 
+      bmi_status = bmi_box%ptr%get_grid_spacing(grid, spacing(:rank))
+    end function get_grid_spacing
+
+    ! Get coordinates of the origin of the computational grid.
+    function get_grid_origin(this, grid, origin) result(bmi_status) bind(C, name="get_grid_origin")
+      type(c_ptr) :: this
+      integer(kind=c_int), intent(in) :: grid
+      real(kind=c_double), intent(out) :: origin (*)
+      integer(kind=c_int) :: bmi_status
+      !use a wrapper for c interop
+      type(box), pointer :: bmi_box
+      integer(kind=c_int) :: rank
+
+      !extract the fortran type from handle
+      call c_f_pointer(this, bmi_box)
+      !Check the  grid rank to decide how many dimsions shape should have
+      !it needs at least one to hold the sentinel (no shape) value
+      bmi_status = bmi_box%ptr%get_grid_rank(grid, rank)
+      if (rank == 0) then
+        rank = 1
+      end if 
+      rank = 2
+      bmi_status = bmi_box%ptr%get_grid_origin(grid, origin(:rank))
+    end function get_grid_origin
+
     function register_bmi(this) result(bmi_status) bind(C, name="register_bmi")
       use, intrinsic:: iso_c_binding, only: c_ptr, c_loc, c_int
       use bminoahmp

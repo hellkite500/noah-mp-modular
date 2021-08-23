@@ -32,6 +32,8 @@ extern set_value_double(void*, char*, double*);
 extern get_grid_rank(void*, int*, int*);
 extern get_grid_size(void*, int*, int*);
 extern get_grid_type(void*, int*, char*);
+extern get_grid_shape(void*, int*, int*);
+extern get_grid_spacing(void*, int*, double*);
 
 int BMI_SUCCESS = 0;
 int BMI_MAX_VAR_NAME = 2048;
@@ -229,6 +231,24 @@ int main(int argc, char** argv)
     status = get_grid_type(&bmi_handle, &grid, grid_type);
     printf("get_grid_type %d: %s\n", grid, grid_type);
     check_status(&status, "get_grid_type");
+
+    int grid_shape = -2;
+    grid = 0;
+    status = get_grid_shape(&bmi_handle, &grid, &grid_shape);
+    printf("get_grid_shape %d: %d\n", grid, grid_shape);
+    // check_status(&status, "get_grid_shape");
+
+    double grid_spacing = -2.0;
+    grid = 0;
+    status = get_grid_spacing(&bmi_handle, &grid, &grid_spacing);
+    printf("get_grid_spacing %d: %lf\n", grid, grid_spacing);
+    // check_status(&status, "get_grid_spacing");
+    
+    double grid_origin = -2;
+    grid = 0;
+    status = get_grid_origin(&bmi_handle, &grid, &grid_origin);
+    printf("get_grid_origin %d: %lf\n", grid, grid_origin);
+    // check_status(&status, "get_grid_origin");
 
     status = finalize(&bmi_handle);
     check_status(&status, "finalize");
