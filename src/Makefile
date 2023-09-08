@@ -131,5 +131,5 @@ RunModule.o: OptionsType.o LevelsType.o DomainType.o ParametersType.o EnergyType
                 ../driver/OutputModule.o UtilitiesModule.o ForcingModule.o InterceptionModule.o \
                 EnergyModule.o WaterModule.o DateTimeUtilsModule.o OptionsGridType.o \
                 LevelsGridType.o DomainGridType.o ParametersGridType.o EnergyGridType.o \
-                ForcingGridType.o WaterGridType.o GridInfoType.o
+                ForcingGridType.o WaterGridType.o GridInfoType.o ../bmi/bmi_grid.o
 

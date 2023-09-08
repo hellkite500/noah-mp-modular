@@ -52,6 +52,7 @@ module RunModule
   type :: noahowpgrid_type
 
     type(namelist_type)       :: namelist
+    type(GridType)            :: grid ! grid meta data
     type(gridinfo_type)       :: gridinfo
     type(levelsgrid_type)     :: levelsgrid
     type(domaingrid_type)     :: domaingrid
@@ -61,6 +62,9 @@ module RunModule
     type(forcinggrid_type)    :: forcinggrid
     type(energygrid_type)     :: energygrid
   
+    contains
+     procedure, public        :: Reallocate
+
   end type
 
 contains
@@ -82,6 +86,12 @@ contains
   
   end subroutine
 
+  !!!!!!!!!!
+  ! Initialize the model and grid data from files
+  !
+  !
+  !
+  !!!!!!!!!
   SUBROUTINE initialize_from_file(model, config_filename)
 
     implicit none
@@ -104,27 +114,105 @@ contains
       !---------------------------------------------------------------------
       !  initialize
       !---------------------------------------------------------------------
+      ! Ok, maybe this isn't too large a refactor, since namelist struct is populated once ReadNamelist is called
+      ! and all the required parts are in there and don't have to be re-read from file for any realloc...
       call namelist%ReadNamelist(config_filename)
+      ! TODO split grid info into grid meta data and grid data variable reading
+      ! required inputs from namelist:
+      ! vegtyp_filename
+      ! namelist%integerMissing
+      ! namelist%realMissing
+      ! namelist%stringMissing
+      ! MAYBE
+      ! namelist%soils_filename
+      ! namelist%slope_filename
+      call gridinfo%Init(namelist)
       call gridinfo%ReadGridInfo(namelist)
       
+      ! required from namelist
+      ! namelist%nsoil
+      ! namelist%nsnow
+      ! namelist%nveg 
       call levelsgrid%Init(namelist)
       call levelsgrid%InitTransfer(namelist)
 
+      ! TODO refactor domain grid for meta data grid spec and other
+      ! TODO allow for reallocation
+      ! required from namelist
+      ! namelist%nsoil
+      ! namelist%nsnow
+      ! namelist%dt
+      ! namelist%startdate
+      ! namelist%enddate
+      ! namelist%terrain_slope
+      ! namelist%azimuth
+      ! namelist%ZREF
+      ! namelist%croptype
+      ! namelist%isltyp
+      ! namelist%sfctyp
+      ! namelist%soilcolor
+      ! namelist%zsoil
+      ! namelist%dzsnso
       call domaingrid%Init(namelist,gridinfo)
       call domaingrid%InitTransfer(namelist,gridinfo)
 
+      ! TODO Nothin, no grid dependence
+      ! Required from namelist
+      ! this%opt_snf   = namelist%precip_phase_option
+      ! this%opt_run   = namelist%runoff_option
+      ! this%opt_drn   = namelist%drainage_option
+      ! this%opt_inf   = namelist%frozen_soil_option
+      ! this%opt_infdv = namelist%dynamic_vic_option
+      ! this%dveg      = namelist%dynamic_veg_option
+      ! this%opt_alb   = namelist%snow_albedo_option
+      ! this%opt_rad   = namelist%radiative_transfer_option
+      ! this%opt_sfc   = namelist%sfc_drag_coeff_option    
+      ! this%opt_crs   = namelist%canopy_stom_resist_option    
+      ! this%opt_crop  = namelist%crop_model_option    
+      ! this%opt_stc   = namelist%snowsoil_temp_time_option 
+      ! this%opt_tbot  = namelist%soil_temp_boundary_option 
+      ! this%opt_frz   = namelist%supercooled_water_option
+      ! this%opt_btr   = namelist%stomatal_resistance_option
+      ! this%opt_rsf   = namelist%evap_srfc_resistance_option
+      ! this%opt_sub   = namelist%subsurface_option
       call optionsgrid%Init(namelist)
       call optionsgrid%InitTransfer(namelist)
 
+      ! TODO split reading and storing of tables/params for re-use in initialization/reinitialization
+      ! TODO seperate require grid meta data from other domain info
+      ! required from namelist
+      ! namelist%nsoil
+      ! namelist%parameter_dir
+      ! namelist%soil_table
+      ! namelist%general_table
+      ! namelist%soil_class_name
+      ! namelist%noahowp_table
+      ! namelist%veg_class_name
+      ! namelist%precip_phase_option
+      ! namelist%rain_snow_thresh
+      ! namelist%zwt
       call parametersgrid%Init(namelist,gridinfo)
       call parametersgrid%paramRead(namelist,domaingrid)
 
+      ! TODO split grid info for allocation/reallocation
+      ! required from namelist
+      ! N/A init transfer is NoOp
       call forcinggrid%Init(gridinfo)
       call forcinggrid%InitTransfer(namelist)
 
+      ! TODO are nsoil/nsnow ect params?  put them in struct and hold globally so we don't have
+      ! to use the namelist?  Especially important if dynamic reallocation is done
+      ! required from namelist
+      ! namelist%nsoil
+      ! namelist%nsnow
+      ! InitTransfer is NoOp
       call energygrid%Init(namelist,gridinfo)
       call energygrid%InitTransfer(namelist)
 
+      ! required from namelist
+      ! namelist%nsoil
+      ! namelist%nsnow
+      ! InitTransfer is NoOp
       call watergrid%Init(namelist,gridinfo)
       call watergrid%InitTransfer(namelist,gridinfo)
 

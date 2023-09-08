@@ -661,6 +661,20 @@ contains
              energygrid  => this%model%energygrid)
 
    select case(name)
+   ! Grid meta data for 2D grid (id of 1, index 2 in grids array)
+   case("grid_1_shape")
+      size = sizeof(grids(2)%shape(1))
+      bmi_status = BMI_SUCCESS
+   case("grid_1_spacing")
+      size = sizeof(grids(2)%spacing(1))
+      bmi_status = BMI_SUCCESS
+   case("grid_1_units")
+      size = sizeof(grids(2)%units(1))
+      bmi_status = BMI_SUCCESS
+   case("grid_1_origin")
+      size = sizeof(grids(2)%units(1))
+      bmi_status = BMI_SUCCESS
+   ! Model Variables
    case("SFCPRS")
       size = sizeof(forcinggrid%sfcprs(1,1)) ! 'sizeof' in gcc & ifort
       bmi_status = BMI_SUCCESS
@@ -723,9 +737,17 @@ contains
    integer :: bmi_status
    integer :: s1, s2, s3, grid, grid_size, item_size
 
-   s1 = this%get_var_grid(name, grid)
-   s2 = this%get_grid_size(grid, grid_size)
    s3 = this%get_var_itemsize(name, item_size)
+
+    select case(name)
+    case("grid_1_shape", "grid_1_spacing", "grid_1_units", "grid_1_origin")
+      nbytes = item_size*grids(2)%rank
+      bmi_status = BMI_SUCCESS
+      return
+    end select
+  
+    s1 = this%get_var_grid(name, grid)
+    s2 = this%get_grid_size(grid, grid_size)
 
     if( grid .eq. 0) then
       !these are the scalar values wrapped in an array
@@ -1001,12 +1023,21 @@ contains
       !==================== UPDATE IMPLEMENTATION IF NECESSARY FOR INTEGER VARS =================
   
       select case(name)
-  !     case("model__identification_number")
-  !        this%model%id = src(1)
-  !        bmi_status = BMI_SUCCESS
-      case default
-         bmi_status = BMI_FAILURE
+         case("grid_1_shape")
+            if( allocated(this%model%grid_var_2) ) deallocate( this%model%grid_var_2 )
+            ! src is in y, x order (last dimension first)
+            ! make this variable be x, y
+            ! FIXME call function to re-allocate all grid vars
+            allocate( this%model%grid_var_2(src(2), src(1)) )
+            grids(2)%shape = src
+            bmi_status = BMI_SUCCESS
+         case("grid_1_units")
+            grids(2)%units = src
+            bmi_status = BMI_SUCCESS
+         case default
+            bmi_status = BMI_FAILURE
       end select
+
     end function noahowp_set_int
 
   ! Set new real values.

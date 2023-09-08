@@ -45,6 +45,7 @@ module DomainGridType
     procedure, private :: InitAllocate 
     procedure, private :: InitDefault     
     procedure, public  :: InitTransfer
+    procedure, public :: Reallocate
   
   end type 
   
@@ -60,6 +61,10 @@ module DomainGridType
       call this%InitDefault()
   
     end subroutine Init
+  
+    subroutine Reallocate(this, grid)
+
+    end subroutine
   
     subroutine InitAllocate(this, namelist, gridinfo)
   

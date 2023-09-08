@@ -145,6 +145,10 @@ module ParametersGridType
     integer                                           :: NBAND                     ! Number of shortwave bands (2, visible and NIR)
     real                                              :: MPE                       ! MPE is nominally small to prevent dividing by zero error
 
+    ! dimension variables
+    integer :: nsoil ! number of soil layers?
+    integer :: AIM_magic_constant
+    ingeger :: another_magic_constant
   contains
 
     procedure, public  :: Init
@@ -163,29 +167,30 @@ module ParametersGridType
     type(namelist_type)                   :: namelist
     type(gridinfo_type)                   :: gridinfo
 
+    this%nsoil = namelist%nsoil
+    this%AIM_magic_constant = 12
+    this%another_magic_constant = 2
     call this%InitAllocate(namelist,gridinfo)
     call this%InitDefault()
 
   end subroutine Init
 
-  subroutine InitAllocate(this, namelist, gridinfo)
+  subroutine InitAllocate(this, gridinfo)
 
     implicit none
     class(parametersgrid_type)     :: this
-    type(namelist_type),intent(in) :: namelist
     type(gridinfo_type),intent(in) :: gridinfo
 
-    associate(n_x   => gridinfo%n_x,  &
-              n_y   => gridinfo%n_y,  &
-              nsoil => namelist%nsoil)
+    associate(n_x   => gridinfo%n_x,  & !FIXME BUG HERE nx  from namelist, ny from gridinfo
+              n_y   => gridinfo%n_y )
 
-    allocate(this%bexp(n_x,n_y,nsoil))
-    allocate(this%smcmax(n_x,n_y,nsoil))
-    allocate(this%smcwlt(n_x,n_y,nsoil))
-    allocate(this%smcref(n_x,n_y,nsoil))
-    allocate(this%dksat(n_x,n_y,nsoil))
-    allocate(this%dwsat(n_x,n_y,nsoil))
-    allocate(this%psisat(n_x,n_y,nsoil))
+    allocate(this%bexp(n_x,n_y, this%nsoil))
+    allocate(this%smcmax(n_x,n_y,this%nsoil))
+    allocate(this%smcwlt(n_x,n_y,this%nsoil))
+    allocate(this%smcref(n_x,n_y,this%nsoil))
+    allocate(this%dksat(n_x,n_y,this%nsoil))
+    allocate(this%dwsat(n_x,n_y,this%nsoil))
+    allocate(this%psisat(n_x,n_y,this%nsoil))
     allocate(this%bvic(n_x,n_y))
     allocate(this%AXAJ(n_x,n_y))
     allocate(this%BXAJ(n_x,n_y))
@@ -206,8 +211,8 @@ module ParametersGridType
     allocate(this%fsatmx(n_x,n_y))
     allocate(this%ZWT_INIT(n_x,n_y))
     allocate(this%urban_flag(n_x,n_y))
-    allocate(this%LAIM(n_x,n_y,12))
-    allocate(this%SAIM(n_x,n_y,12))
+    allocate(this%LAIM(n_x,n_y,this%AIM_magic_constant))
+    allocate(this%SAIM(n_x,n_y,this%AIM_magic_constant))
     allocate(this%LAI(n_x,n_y))
     allocate(this%SAI(n_x,n_y))
     allocate(this%CH2OP(n_x,n_y))
@@ -242,18 +247,18 @@ module ParametersGridType
     allocate(this%VAI(n_x,n_y))
     allocate(this%VEG(n_x,n_y))
     allocate(this%FVEG(n_x,n_y))
-    allocate(this%RHOL(n_x,n_y,2))
-    allocate(this%RHOS(n_x,n_y,2))
-    allocate(this%TAUL(n_x,n_y,2))
-    allocate(this%TAUS(n_x,n_y,2))
+    allocate(this%RHOL(n_x,n_y,this%another_magic_constant))
+    allocate(this%RHOS(n_x,n_y,this%another_magic_constant))
+    allocate(this%TAUL(n_x,n_y,this%another_magic_constant))
+    allocate(this%TAUS(n_x,n_y,this%another_magic_constant))
     allocate(this%SSI(n_x,n_y))
     allocate(this%MFSNO(n_x,n_y))
     allocate(this%Z0SNO(n_x,n_y))
     allocate(this%RSURF_SNOW(n_x,n_y))
     allocate(this%RSURF_EXP(n_x,n_y))
-    allocate(this%ALBSAT(n_x,n_y,2))
-    allocate(this%ALBDRY(n_x,n_y,2))
-    allocate(this%EG(n_x,n_y,2))
+    allocate(this%ALBSAT(n_x,n_y,this%another_magic_constant))
+    allocate(this%ALBDRY(n_x,n_y,this%AIM_magic_constant))
+    allocate(this%EG(n_x,n_y,this%AIM_magic_constant))
     allocate(this%WSLMAX(n_x,n_y))
     allocate(this%max_liq_mass_fraction(n_x,n_y))
     allocate(this%SNOW_RET_FAC(n_x,n_y))

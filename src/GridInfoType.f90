@@ -2,6 +2,7 @@ module GridInfoType
   
   use netcdf
   use NamelistRead, only: namelist_type
+  use bmi_grid
 
   implicit none
   save
@@ -25,7 +26,7 @@ module GridInfoType
   character(len=12)                  :: stringMissing 
 
   contains
-
+    procedure, public :: Init
     procedure, public  :: ReadGridInfo
     procedure, private :: ReadSpatial
     procedure, private :: ReadVegtyp  
@@ -34,10 +35,9 @@ module GridInfoType
 
 contains
 
-  subroutine ReadGridInfo(this,namelist)
-
+  subroutine Init(this, namelist)
     class(gridinfo_type)               :: this
-    type(namelist_type),intent(in)     :: namelist 
+    type(namelist_type),intent(in)     :: namelist
 
     !----------------------------------------------------------------------------
     ! Set expected names for all NetCDF-defined variables, dimensions and attributes
@@ -54,7 +54,15 @@ contains
     this%integerMissing  = namelist%integerMissing
     this%realMissing     = namelist%realMissing
     this%stringMissing   = namelist%stringMissing
+  end subroutine
 
+  subroutine ReadGridInfo(this,namelist)
+
+    class(gridinfo_type)               :: this
+    type(namelist_type),intent(in)     :: namelist 
+
+   
+    ! TODO check if initialized???
     !----------------------------------------------------------------------------
     ! Call subroutines to read input NetCDF files
     !----------------------------------------------------------------------------

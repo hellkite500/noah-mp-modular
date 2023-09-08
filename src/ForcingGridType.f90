@@ -98,8 +98,8 @@ contains
     allocate(this%RHOAIR(n_x,n_y))
     allocate(this%FPICE(n_x,n_y))
     allocate(this%SWDOWN(n_x,n_y))
-    allocate(this%SOLAD(n_x,n_y,2))
-    allocate(this%SOLAI(n_x,n_y,2))
+    allocate(this%SOLAD(n_x,n_y,2)) !FIXME magic constant
+    allocate(this%SOLAI(n_x,n_y,2)) !FIXME magic constant
 
     end associate
 

@@ -1,5 +1,9 @@
 module LevelsGridType
 
+  !!!!
+  ! NJF This is a misleading type...is there a reason it is implied that a level is more than one dimensional?
+  ! I don't really see a difference between this and the regular LevelsType...
+  !!!!
 use NamelistRead, only: namelist_type
 implicit none
 save
